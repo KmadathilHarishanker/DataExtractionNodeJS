@@ -4,317 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Parser Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-        }
-
-        .card h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .upload-area {
-            border: 2px dashed #667eea;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            background-color: #f8f9ff;
-            transition: all 0.3s;
-        }
-
-        .upload-area:hover {
-            border-color: #764ba2;
-            background-color: #f0f2ff;
-        }
-
-        .upload-area.dragover {
-            border-color: #764ba2;
-            background-color: #e8ebff;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .upload-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .upload-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            background: #f8f9ff;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-label {
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .uploads-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .upload-item {
-            background: #f8f9ff;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .upload-item h4 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .upload-meta {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .status {
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .status.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .powerbi-section {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-
-        .powerbi-section h2 {
-            color: white;
-        }
-
-        .powerbi-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .api-endpoint {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            margin: 10px 0;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 File Parser Dashboard</h1>
-            <p>Upload CSV, JSON, or XML files to parse and store in database for Power BI integration</p>
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-6xl mx-auto py-8 px-4">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl p-8 mb-8 shadow-lg text-center">
+            <h1 class="text-4xl font-bold mb-2">📊 File Parser Dashboard</h1>
+            <p class="text-lg opacity-90">Upload CSV, JSON, or XML files to parse and store in database for analytics</p>
         </div>
 
-        <div class="dashboard">
-            <div class="card">
-                <h2>📁 Upload File</h2>
-                <div class="upload-area" id="uploadArea">
-                    <p>Drag and drop your file here or</p>
-                    <br>
-                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white rounded-xl shadow p-8 flex flex-col items-center">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">📁 Upload File</h2>
+                <div class="w-full border-2 border-dashed border-indigo-400 rounded-lg p-8 text-center bg-indigo-50 hover:bg-indigo-100 transition mb-4" id="uploadArea">
+                    <p class="text-gray-600">Drag and drop your file here or</p>
+                    <button class="mt-4 px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full font-semibold shadow hover:scale-105 transition" onclick="document.getElementById('fileInput').click()">
                         Choose File
                     </button>
-                    <input type="file" id="fileInput" class="file-input" accept=".csv,.json,.xml">
-                    <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
-                        Supported formats: CSV, JSON, XML (Max 10MB)
-                    </p>
+                    <input type="file" id="fileInput" class="hidden" accept=".csv,.json,.xml">
+                    <p class="mt-4 text-sm text-gray-500">Supported formats: CSV, JSON, XML (Max 10MB)</p>
                 </div>
-                
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
+                <div class="hidden text-center" id="loading">
+                    <svg class="animate-spin h-8 w-8 text-indigo-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
                     <p>Processing file...</p>
                 </div>
-                
-                <div class="status" id="status"></div>
+                <div class="hidden mt-4" id="status"></div>
             </div>
 
-            <div class="card">
-                <h2>📈 Statistics</h2>
-                <div class="stats-grid" id="statsGrid">
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalUploads">0</div>
-                        <div class="stat-label">Total Uploads</div>
+            <div class="bg-white rounded-xl shadow p-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">📈 Statistics</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="statsGrid">
+                    <div class="bg-indigo-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-indigo-600" id="totalUploads">0</div>
+                        <div class="text-gray-600">Total Uploads</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalRecords">0</div>
-                        <div class="stat-label">Total Records</div>
+                    <div class="bg-indigo-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-indigo-600" id="totalRecords">0</div>
+                        <div class="text-gray-600">Total Records</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="csvFiles">0</div>
-                        <div class="stat-label">CSV Files</div>
+                    <div class="bg-indigo-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-indigo-600" id="csvFiles">0</div>
+                        <div class="text-gray-600">CSV Files</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="jsonFiles">0</div>
-                        <div class="stat-label">JSON Files</div>
+                    <div class="bg-indigo-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-indigo-600" id="jsonFiles">0</div>
+                        <div class="text-gray-600">JSON Files</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="xmlFiles">0</div>
-                        <div class="stat-label">XML Files</div>
+                    <div class="bg-indigo-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-indigo-600" id="xmlFiles">0</div>
+                        <div class="text-gray-600">XML Files</div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="card">
-                <h2>📋 Recent Uploads</h2>
-                <div class="uploads-list" id="uploadsList">
-                    <p style="color: #666; text-align: center;">No uploads yet</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white rounded-xl shadow p-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">📋 Recent Uploads</h2>
+                <div class="max-h-80 overflow-y-auto" id="uploadsList">
+                    <p class="text-gray-500 text-center">No uploads yet</p>
                 </div>
             </div>
-
-            <div class="card powerbi-section">
-                <h2>⚡ Power BI Integration</h2>
-                <div class="powerbi-info">
-                    <p><strong>API Endpoint for Power BI:</strong></p>
-                    <div class="api-endpoint" id="powerbiEndpoint">
-                        http://localhost:3000/api/powerbi-data
-                    </div>
-                    <p style="margin-top: 15px;">
-                        <strong>Steps to connect:</strong><br>
-                        1. Open Power BI Desktop<br>
-                        2. Get Data → Web<br>
-                        3. Enter the API endpoint above<br>
-                        4. Configure refresh settings as needed
-                    </p>
+            
+            <div class="bg-white rounded-xl shadow p-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">📊 Power BI Real-time Dashboard</h2>
+                <p class="mb-4 text-gray-600">View live analytics and insights from your uploaded files.</p>
+                <!-- Replace the src below with your Power BI embed URL -->
+                <iframe 
+                    src="https://app.powerbi.com/view?r=eyJrIjoiYOUR_DASHBOARD_ID_HERE" 
+                    width="100%" 
+                    height="500" 
+                    frameborder="0" 
+                    allowfullscreen="true"
+                    class="rounded-lg shadow">
+                </iframe>
+                <div class="mt-4 flex justify-center gap-4">
+                    <button onclick="refreshPowerBI()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        🔄 Refresh Dashboard
+                    </button>
+                    <a href="https://app.powerbi.com" target="_blank" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+                        📊 Open in Power BI
+                    </a>
                 </div>
             </div>
+        </div>
+
+        <div class="flex justify-center gap-4 flex-wrap">
+            <a href="/database-viewer" class="px-6 py-2 bg-indigo-500 text-white rounded-full font-semibold shadow hover:bg-indigo-600 transition">🗄️ View Database Records</a>
+            <a href="/latest-report" class="px-6 py-2 bg-blue-500 text-white rounded-full font-semibold shadow hover:bg-blue-600 transition">📊 Latest Power BI Report</a>
+            <a href="/api/export-latest-csv" class="px-6 py-2 bg-green-500 text-white rounded-full font-semibold shadow hover:bg-green-600 transition">📥 Export Latest CSV</a>
+            <a href="/api/export-latest-json" class="px-6 py-2 bg-purple-500 text-white rounded-full font-semibold shadow hover:bg-purple-600 transition">📥 Export Latest JSON</a>
         </div>
     </div>
 
@@ -463,9 +246,13 @@
             }
         }
 
-        // Update Power BI endpoint with current host
-        document.getElementById('powerbiEndpoint').textContent = 
-            `${window.location.protocol}//${window.location.host}/api/powerbi-data`;
+        // Function to refresh Power BI embed
+        function refreshPowerBI() {
+            const iframe = document.querySelector('iframe[src*="powerbi.com"]');
+            if (iframe) {
+                iframe.src = iframe.src; // Force iframe to reload its content
+            }
+        }
     </script>
 </body>
 </html>

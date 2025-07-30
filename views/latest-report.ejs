@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">📊 Latest Power BI Report</h1>
+                    <p class="text-gray-600">Automatically generated report for the most recently uploaded file</p>
+                </div>
+                <a href="/" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <% if (hasData) { %>
+            <!-- File Information -->
+            <div class="bg-white rounded-xl shadow p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">📁 File Details</h3>
+                        <div class="space-y-2 text-sm">
+                            <p><span class="font-medium">Name:</span> <%= upload.filename %></p>
+                            <p><span class="font-medium">Type:</span> <%= upload.file_type %></p>
+                            <p><span class="font-medium">Size:</span> <%= (upload.file_size / 1024).toFixed(2) %> KB</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">📈 Data Summary</h3>
+                        <div class="space-y-2 text-sm">
+                            <p><span class="font-medium">Records:</span> <%= recordCount.toLocaleString() %></p>
+                            <p><span class="font-medium">Uploaded:</span> <%= new Date(upload.upload_date).toLocaleString() %></p>
+                            <p><span class="font-medium">Table:</span> <%= upload.table_name %></p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">🔄 Actions</h3>
+                        <div class="space-y-2">
+                            <button onclick="refreshReport()" class="w-full px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm">
+                                🔄 Refresh Report
+                            </button>
+                            <button onclick="downloadData()" class="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm">
+                                📥 Download Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power BI Report -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-900">📊 Power BI Analytics Report</h2>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-gray-600">Live Report</span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                    <p class="text-sm text-gray-600 mb-2">💡 <strong>Note:</strong> Replace the Power BI URL below with your actual report URL. The report will automatically update when new files are uploaded.</p>
+                    <div class="bg-white rounded p-3 border">
+                        <code class="text-xs text-gray-700 break-all"><%= powerBIEmbedUrl %></code>
+                    </div>
+                </div>
+
+                <!-- Power BI Embed -->
+                <div class="relative">
+                    <iframe 
+                        src="<%= powerBIEmbedUrl %>"
+                        width="100%" 
+                        height="600" 
+                        frameborder="0" 
+                        allowfullscreen="true"
+                        class="rounded-lg shadow-lg"
+                        id="powerBIReport">
+                    </iframe>
+                    
+                    <!-- Loading overlay -->
+                    <div id="loadingOverlay" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg">
+                        <div class="text-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+                            <p class="text-gray-600">Loading Power BI Report...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Controls -->
+                <div class="mt-6 flex flex-wrap gap-4 justify-center">
+                    <button onclick="refreshReport()" class="px-6 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition">
+                        🔄 Refresh Report
+                    </button>
+                    <button onclick="openInPowerBI()" class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        📊 Open in Power BI
+                    </button>
+                    <button onclick="shareReport()" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                        📤 Share Report
+                    </button>
+                </div>
+            </div>
+
+        <% } else { %>
+            <!-- No Data State -->
+            <div class="bg-white rounded-xl shadow p-12 text-center">
+                <div class="mb-6">
+                    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-4xl">📊</span>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-2">No Reports Available</h2>
+                    <p class="text-gray-600 mb-6"><%= message %></p>
+                </div>
+                <a href="/" class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition">
+                    📁 Upload Your First File
+                </a>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        // Remove loading overlay when iframe loads
+        document.getElementById('powerBIReport').addEventListener('load', function() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        });
+
+        // Refresh the Power BI report
+        function refreshReport() {
+            const iframe = document.getElementById('powerBIReport');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            loadingOverlay.style.display = 'flex';
+            iframe.src = iframe.src;
+        }
+
+        // Open report in Power BI
+        function openInPowerBI() {
+            const iframe = document.getElementById('powerBIReport');
+            window.open(iframe.src, '_blank');
+        }
+
+        // Share report
+        function shareReport() {
+            const iframe = document.getElementById('powerBIReport');
+            const url = iframe.src;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Power BI Report',
+                    url: url
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Report URL copied to clipboard!');
+                });
+            }
+        }
+
+        // Download data
+        function downloadData() {
+            fetch('/api/latest-report')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Create download link for the data
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'latest-report-data.json';
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error downloading data:', error);
+                    alert('Error downloading data');
+                });
+        }
+
+        // Auto-refresh every 5 minutes
+        setInterval(() => {
+            fetch('/api/latest-report')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update record count if it changed
+                        const recordCountElement = document.querySelector('[data-record-count]');
+                        if (recordCountElement && recordCountElement.textContent !== data.recordCount.toString()) {
+                            recordCountElement.textContent = data.recordCount.toLocaleString();
+                        }
+                    }
+                })
+                .catch(error => console.error('Auto-refresh error:', error));
+        }, 300000); // 5 minutes
+    </script>
+</body>
+</html> 
